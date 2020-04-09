@@ -1,0 +1,109 @@
+
+if (generatePublishingTaskForProject()) {
+    def groupName = rootProject.findProperty("group") ?: project.group ?: rootProject.group
+    def artifactName = project.findProperty("artifactName") ?: rootProject.findProperty("artifactName") ?: project.name ?: rootProject.name
+    def projectVersion = rootProject.findProperty("version") ?: project.version ?: rootProject.version
+
+    def projectDescription = project.findProperty("projectDescription") ?: rootProject.findProperty("projectDescription")
+    def sourceCodeRepositoryBaseUrl = project.findProperty("sourceCodeRepositoryBaseUrl") ?: rootProject.findProperty("sourceCodeRepositoryBaseUrl")
+
+    def licenseName = project.findProperty("licenseName") ?: rootProject.findProperty("licenseName") ?: "The Apache License, Version 2.0"
+    def licenseUrl = project.findProperty("licenseUrl") ?: rootProject.findProperty("licenseUrl") ?: "http://www.apache.org/licenses/LICENSE-2.0.txt"
+    
+    configurePublishingTaskForProject(groupName, artifactName, projectVersion, projectDescription,
+            sourceCodeRepositoryBaseUrl, licenseName, licenseUrl)
+}
+
+
+def generatePublishingTaskForProject() {
+    // don't apply maven-publish plugin on Android or Java application projects
+    return plugins.findPlugin("com.android.application") == null && plugins.findPlugin("application") == null
+}
+
+
+def configurePublishingTaskForProject(groupName, artifactName, projectVersion, projectDescription,
+                                      sourceCodeRepositoryBaseUrl, licenseName, licenseUrl) {
+
+    apply plugin: "java-library"
+    apply plugin: "maven-publish"
+    apply plugin: "signing"
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    artifacts {
+        archives jar
+        archives sourcesJar
+        archives javadocJar
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                // artifact can be set with ext.artifactName in each sub project
+
+                from components.java
+
+                pom {
+                    groupId = groupName
+                    artifactId = artifactName
+                    version = projectVersion
+                    description = projectDescription
+                    url = "https://$sourceCodeRepositoryBaseUrl"
+
+                    scm {
+                        connection = "scm:git:git://${sourceCodeRepositoryBaseUrl}.git"
+                        developerConnection = "scm:git:ssh://${sourceCodeRepositoryBaseUrl}.git"
+                        url = "https://$sourceCodeRepositoryBaseUrl"
+                    }
+
+                    developers {
+                        developer {
+                            id = "dankito"
+                            name = "Christian Dankl"
+                            email = "maven@dankito.net"
+                        }
+                    }
+
+                    licenses {
+                        license {
+                            name = licenseName
+                            url = licenseUrl
+                        }
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
+
+                def username = rootProject.findProperty("ossrhUsername") // TODO: rename to sonatypeUsername
+                def password = rootProject.findProperty("ossrhPassword") // TODO: rename to sonatypePassword
+
+                if (ossrhUsername != null && ossrhPassword != null) {
+                    credentials {
+                        username = ossrhUsername
+                        password = ossrhPassword
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        sign publishing.publications.mavenJava
+    }
+
+
+    javadoc {
+        if(JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption("html5", true)
+        }
+    }
+}

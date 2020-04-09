@@ -1,0 +1,54 @@
+ext {
+    isMultiProjectBuild = subprojects.empty == false
+
+    currentDir = buildscript.sourceFile.parent // needed as e.g. 'utils.gradle' does not work
+}
+
+
+def isAndroidProject(project) {
+    return project.hasProperty("android")
+}
+
+def isSonarQubePluginApplied(project) {
+    for (plugin in project.plugins) { 
+        if (plugin.class.simpleName == "SonarQubePlugin") {
+            return true
+        }
+    }
+    
+    return false
+}
+
+
+apply from: "$currentDir/utils.gradle"
+
+
+if (isMultiProjectBuild) {
+    subprojects {
+        afterEvaluate {
+            applyScriptsToProject(it)
+        }
+    }
+}
+else {
+    afterEvaluate {
+        applyScriptsToProject(it)
+    }
+}
+
+def applyScriptsToProject(project) {
+    if ((project.version == null || "unspecified".equals(project.version)) && rootProject.version != null) {
+        project.version = rootProject.version
+        println("Set project.version to ${project.version}")
+    }
+    
+    project.apply from: "$currentDir/publishToMaven.gradle"
+
+    if (isAndroidProject(project) == false) {
+        project.apply from: "$currentDir/integrationTestSetup.gradle"
+
+        if (isSonarQubePluginApplied(project)) {
+            project.apply from: "$currentDir/codeQualityPlugins.gradle"
+        }
+    }
+}

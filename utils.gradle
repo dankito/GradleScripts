@@ -1,0 +1,18 @@
+
+allprojects {
+
+    task printConfigurations {
+        group 'help'
+        description "Prints project's configurations to console"
+        
+        doFirst {
+            println "\nConfigurations:"
+            println configurations.collect { println it.name }
+        }
+    }
+    
+    task allDeps(type: DependencyReportTask) {
+        group 'help'
+        description 'To have a simple way to print all dependencies to console'
+    }
+}
