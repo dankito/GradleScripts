@@ -1,0 +1,1 @@
+Common Gradle scripts I use in multiple projects e.g. to add an Integration Test configuration and publish artifacts to Maven Central and local Maven repository.
