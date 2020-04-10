@@ -83,13 +83,13 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
                 def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
                 url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
 
-                def username = rootProject.findProperty("ossrhUsername") // TODO: rename to sonatypeUsername
-                def password = rootProject.findProperty("ossrhPassword") // TODO: rename to sonatypePassword
+                def sonatypeUsername = rootProject.findProperty("ossrhUsername") // TODO: rename to sonatypeUsername
+                def sonatypePassword = rootProject.findProperty("ossrhPassword") // TODO: rename to sonatypePassword
 
-                if (ossrhUsername != null && ossrhPassword != null) {
+                if (sonatypeUsername != null && sonatypePassword != null) {
                     credentials {
-                        username = ossrhUsername
-                        password = ossrhPassword
+                        username = sonatypeUsername
+                        password = sonatypePassword
                     }
                 }
             }
