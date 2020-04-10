@@ -28,6 +28,11 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
     apply plugin: "maven-publish"
     apply plugin: "signing"
 
+
+    def sonatypeUsername = rootProject.findProperty("ossrhUsername") // TODO: rename to sonatypeUsername
+    def sonatypePassword = rootProject.findProperty("ossrhPassword") // TODO: rename to sonatypePassword
+    
+
     java {
         withJavadocJar()
         withSourcesJar()
@@ -84,9 +89,6 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
                 def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
                 url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
 
-                def sonatypeUsername = rootProject.findProperty("ossrhUsername") // TODO: rename to sonatypeUsername
-                def sonatypePassword = rootProject.findProperty("ossrhPassword") // TODO: rename to sonatypePassword
-
                 if (sonatypeUsername != null && sonatypePassword != null) {
                     credentials {
                         username = sonatypeUsername
@@ -105,6 +107,14 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
     javadoc {
         if(JavaVersion.current().isJava9Compatible()) {
             options.addBooleanOption("html5", true)
+        }
+    }
+    
+    rootProject.pluginManager.withPlugin("io.codearte.nexus-staging") {
+        nexusStaging {
+            packageGroup = "net.dankito"
+            username = sonatypeUsername
+            password = sonatypePassword
         }
     }
 }
