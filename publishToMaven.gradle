@@ -50,6 +50,7 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
                     groupId = groupName
                     artifactId = artifactName
                     version = projectVersion
+                    name = artifactName
                     description = projectDescription
                     url = "https://$sourceCodeRepositoryBaseUrl"
 
