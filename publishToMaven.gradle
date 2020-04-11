@@ -116,5 +116,13 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
             username = sonatypeUsername
             password = sonatypePassword
         }
+
+        task publishAndRelease {
+            group = "release"
+            description = "First calls the publish task and then the io.codearte.nexus-staging's closeAndRelease task"
+
+            dependsOn = [ "publish" ]
+            finalizedBy = [ ":closeAndReleaseRepository" ]
+        }
     }
 }
