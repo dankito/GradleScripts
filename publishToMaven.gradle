@@ -33,17 +33,21 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
 
     def sonatypeUsername = rootProject.findProperty("ossrhUsername") // TODO: rename to sonatypeUsername
     def sonatypePassword = rootProject.findProperty("ossrhPassword") // TODO: rename to sonatypePassword
-    
 
-    java {
-        withJavadocJar()
-        withSourcesJar()
+
+    if (gradle.gradleVersion.startsWith("6.")) { // is only available for Gradle versions 6 and above
+        java {
+            withJavadocJar()
+            withSourcesJar()
+        }
     }
 
     artifacts {
         archives jar
-        archives sourcesJar
-        archives javadocJar
+        if (gradle.gradleVersion.startsWith("6.")) { // is only available for Gradle versions 6 and above
+            archives sourcesJar
+            archives javadocJar
+        }
     }
 
     publishing {
