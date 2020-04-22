@@ -17,7 +17,9 @@ if (generatePublishingTaskForProject()) {
 
 def generatePublishingTaskForProject() {
     // don't apply maven-publish plugin on Android or Java application projects
-    return plugins.findPlugin("com.android.application") == null && plugins.findPlugin("application") == null
+    return plugins.findPlugin("com.android.application") == null &&
+            plugins.findPlugin("com.android.library") == null &&
+            plugins.findPlugin("application") == null
 }
 
 
