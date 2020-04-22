@@ -99,8 +99,10 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
         }
     }
 
-    signing {
-        sign publishing.publications.mavenJava
+    if (sonatypeUsername != null && sonatypePassword != null) {
+        signing {
+            sign publishing.publications.mavenJava
+        }
     }
 
 
