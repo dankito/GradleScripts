@@ -18,7 +18,6 @@ if (generatePublishingTaskForProject()) {
 def generatePublishingTaskForProject() {
     // don't apply maven-publish plugin on Android or Java application projects
     return plugins.findPlugin("com.android.application") == null &&
-            plugins.findPlugin("com.android.library") == null &&
             plugins.findPlugin("application") == null
 }
 
@@ -26,7 +25,15 @@ def generatePublishingTaskForProject() {
 def configurePublishingTaskForProject(groupName, artifactName, projectVersion, projectDescription,
                                       sourceCodeRepositoryBaseUrl, licenseName, licenseUrl) {
 
-    apply plugin: "java-library"
+    def isAndroidProject = project.hasProperty("android") // = isAndroidProject(project)
+
+    if (isAndroidProject) {
+        apply plugin: "com.android.library"
+    }
+    else {
+        apply plugin: "java-library"
+    }
+
     apply plugin: "maven-publish"
     apply plugin: "signing"
 
@@ -36,26 +43,36 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
 
 
     if (gradle.gradleVersion.startsWith("6.")) { // is only available for Gradle versions 6 and above
-        java {
-            withJavadocJar()
-            withSourcesJar()
+        if (isAndroidProject == false) {
+            java {
+                withJavadocJar()
+                withSourcesJar()
+            }
         }
     }
 
     artifacts {
-        archives jar
-        if (gradle.gradleVersion.startsWith("6.")) { // is only available for Gradle versions 6 and above
-            archives sourcesJar
-            archives javadocJar
+        if (isAndroidProject == false) {
+            archives jar
+
+            if (gradle.gradleVersion.startsWith("6.")) { // is only available for Gradle versions 6 and above
+                archives sourcesJar
+                archives javadocJar
+            }
         }
     }
 
     publishing {
         publications {
-            mavenJava(MavenPublication) {
+            release(MavenPublication) {
                 // artifact can be set with ext.artifactName in each sub project
 
-                from components.java
+                if (isAndroidProject == false) {
+                    from components.java
+                }
+//                else { // TODO: make this work, may we then can omit custom Android configuration
+//                    from components.release
+//                }
 
                 pom {
                     groupId = groupName
@@ -107,14 +124,16 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
 
     if (sonatypeUsername != null && sonatypePassword != null) {
         signing {
-            sign publishing.publications.mavenJava
+            sign publishing.publications.release
         }
     }
 
 
-    javadoc {
-        if(JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption("html5", true)
+    if (isAndroidProject == false) {
+        javadoc {
+            if(JavaVersion.current().isJava9Compatible()) {
+                options.addBooleanOption("html5", true)
+            }
         }
     }
     
