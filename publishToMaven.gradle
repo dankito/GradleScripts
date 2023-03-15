@@ -47,8 +47,8 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
     def sonatypeUsername = rootProject.findProperty("ossrhUsername") // TODO: rename to sonatypeUsername
     def sonatypePassword = rootProject.findProperty("ossrhPassword") // TODO: rename to sonatypePassword
 
-
-    if (gradle.gradleVersion.startsWith("6.")) { // is only available for Gradle versions 6 and above
+    def versionMajor = gradle.gradleVersion.substring(0, gradle.gradleVersion.indexOf('.'))
+    if (Integer.parseInt(versionMajor) >= 6) { // is only available for Gradle versions 6 and above
         if (isAndroidProject == false) {
             java {
                 withJavadocJar()
