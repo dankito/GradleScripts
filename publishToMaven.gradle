@@ -70,8 +70,9 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
 
     publishing {
         publications {
-            release(MavenPublication) {
+            mavenJava(MavenPublication) {
                 // artifact can be set with ext.artifactName in each sub project
+                artifactId = artifactName
 
                 if (isAndroidProject == false) {
                     from components.java
@@ -81,10 +82,10 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
 //                }
 
                 pom {
+                    name = artifactName
                     groupId = groupName
                     artifactId = artifactName
                     version = projectVersion
-                    name = artifactName
                     description = projectDescription
                     url = "https://$sourceCodeRepositoryBaseUrl"
 
@@ -133,7 +134,7 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
 
     if (sonatypeUsername != null && sonatypePassword != null) {
         signing {
-            sign publishing.publications.release
+            sign publishing.publications.mavenJava
         }
     }
 
