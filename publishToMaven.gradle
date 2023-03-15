@@ -9,9 +9,15 @@ if (generatePublishingTaskForProject()) {
 
     def licenseName = project.findProperty("licenseName") ?: rootProject.findProperty("licenseName") ?: "The Apache License, Version 2.0"
     def licenseUrl = project.findProperty("licenseUrl") ?: rootProject.findProperty("licenseUrl") ?: "http://www.apache.org/licenses/LICENSE-2.0.txt"
+
+    def developerId = project.findProperty("developerId") ?: rootProject.findProperty("developerId") ?: "dankito"
+    def developerName = project.findProperty("developerName") ?: rootProject.findProperty("developerName") ?: "Christian Dankl"
+    def developerMail = project.findProperty("developerMail") ?: rootProject.findProperty("developerMail") ?: "maven@dankito.net"
+
+    def packageGroup = project.findProperty("packageGroup") ?: rootProject.findProperty("packageGroup") ?: "net.dankito"
     
     configurePublishingTaskForProject(groupName, artifactName, projectVersion, projectDescription,
-            sourceCodeRepositoryBaseUrl, licenseName, licenseUrl)
+            sourceCodeRepositoryBaseUrl, licenseName, licenseUrl, developerId, developerName, developerMail, packageGroup)
 }
 
 
@@ -22,8 +28,8 @@ def generatePublishingTaskForProject() {
 }
 
 
-def configurePublishingTaskForProject(groupName, artifactName, projectVersion, projectDescription,
-                                      sourceCodeRepositoryBaseUrl, licenseName, licenseUrl) {
+def configurePublishingTaskForProject(groupName, artifactName, projectVersion, projectDescription, sourceCodeRepositoryBaseUrl, licenseName, licenseUrl,
+                                      developerId, developerName, developerMail, packageGroupName) {
 
     def isAndroidProject = project.hasProperty("android") // = isAndroidProject(project)
 
@@ -90,9 +96,9 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
 
                     developers {
                         developer {
-                            id = "dankito"
-                            name = "Christian Dankl"
-                            email = "maven@dankito.net"
+                            id = developerId
+                            name = developerName
+                            email = developerMail
                         }
                     }
 
@@ -139,7 +145,7 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
     
     rootProject.pluginManager.withPlugin("io.codearte.nexus-staging") {
         nexusStaging {
-            packageGroup = "net.dankito"
+            packageGroup = packageGroupName
             username = sonatypeUsername
             password = sonatypePassword
         }
