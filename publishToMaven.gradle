@@ -1,6 +1,6 @@
 
 if (generatePublishingTaskForProject()) {
-    def groupName = rootProject.findProperty("group") ?: project.group ?: rootProject.group
+    def groupName = project.findProperty("group") ?: rootProject.findProperty("group") ?: project.group ?: rootProject.group
     def artifactName = project.findProperty("artifactName") ?: rootProject.findProperty("artifactName") ?: project.name ?: rootProject.name
     def projectVersion = rootProject.findProperty("version") ?: project.version ?: rootProject.version
 
