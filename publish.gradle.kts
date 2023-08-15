@@ -56,6 +56,8 @@ configure<PublishingExtension> {
       artifactId = usedArtifactId
       version = artifactVersion
 
+      println("Publishing $groupId:$usedArtifactId:$artifactVersion ($name)")
+
       if (name == "jvm") {
         artifact(tasks["javadocJar"])
       }

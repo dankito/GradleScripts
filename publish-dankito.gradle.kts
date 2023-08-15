@@ -7,8 +7,7 @@ setExtraValueIfNotSet("developerName", "Christian Dankl")
 setExtraValueIfNotSet("developerMail", "maven@dankito.net")
 
 
-val publishScript = File(File(project.gradle.gradleUserHomeDir, "scripts"), "publish.gradle.kts")
-apply(from = publishScript)
+apply(from = File(buildscript.sourceFile?.parentFile, "publish.gradle.kts"))
 
 
 fun setExtraValueIfNotSet(name: String, vararg values: Any?) {
