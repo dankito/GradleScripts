@@ -8,7 +8,7 @@ val sonatypeUsername: String? by project
 val sonatypePassword: String? by project
 
 val groupId: String = getOrDefault("groupId", project.group as String)
-val artifactId: String by extra
+val customArtifactId: String? by extra
 val artifactVersion: String = getOrDefault("artifactVersion", project.version as String)
 
 val projectDescription: String by extra
@@ -44,8 +44,16 @@ configure<PublishingExtension> {
   val publishing = this
   publications {
     withType<MavenPublication> {
+      val usedArtifactId = customArtifactId?.let { customArtifactId ->
+        if (name.isNullOrEmpty() || name == "kotlinMultiplatform") {
+          customArtifactId
+        } else {
+          "$customArtifactId-$name"
+        }
+      } ?: artifactId
+
       groupId = groupId
-      artifactId = artifactId
+      artifactId = usedArtifactId
       version = artifactVersion
 
       if (name == "jvm") {
@@ -53,7 +61,7 @@ configure<PublishingExtension> {
       }
 
       pom {
-        name.set(artifactId)
+        name.set(usedArtifactId)
         description.set(projectDescription)
         url.set("https://$sourceCodeRepositoryBaseUrl")
 
