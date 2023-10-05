@@ -40,70 +40,30 @@ tasks {
     }
 }
 
+val isKotlinMultiplatformProject = project.plugins.any { it::class.java.name.startsWith("org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPlugin") }
+
 configure<PublishingExtension> {
   val publishing = this
   publications {
-    withType<MavenPublication> {
-      val usedArtifactId = customArtifactId?.let { customArtifactId ->
-        if (name.isNullOrEmpty() || name == "kotlinMultiplatform") {
-          customArtifactId
-        } else {
-          "$customArtifactId-$name"
-        }
-      } ?: artifactId
+    if (isKotlinMultiplatformProject) {
+      withType<MavenPublication> {
+        val artifactIdToUse = customArtifactId?.let { customArtifactId ->
+          if (name.isNullOrEmpty() || name == "kotlinMultiplatform") {
+            customArtifactId
+          } else {
+            "$customArtifactId-$name"
+          }
+        } ?: artifactId
 
-      groupId = groupId
-      artifactId = usedArtifactId
-      version = artifactVersion
-
-      println("Publishing $groupId:$usedArtifactId:$artifactVersion ($name)")
-
-      if (name == "jvm") {
-        artifact(tasks["javadocJar"])
+        this.configure(artifactIdToUse)
       }
+    } else {
+      create<MavenPublication>("mavenJava") {
+        from(components["java"])
 
-      pom {
-        name.set(usedArtifactId)
-        description.set(projectDescription)
-        url.set("https://$sourceCodeRepositoryBaseUrl")
+        val artifactIdToUse = customArtifactId ?: artifactId
 
-        licenses {
-          license {
-            name.set(licenseName)
-            url.set(licenseUrl)
-          }
-        }
-
-        scm {
-          url.set("https://$sourceCodeRepositoryBaseUrl")
-          connection.set("scm:git:git://${sourceCodeRepositoryBaseUrl}.git")
-          developerConnection.set("scm:git:ssh://${sourceCodeRepositoryBaseUrl}.git")
-        }
-
-        developers {
-          if (!developerId.isNullOrEmpty()) {
-            developer {
-              id.set(developerId)
-              name.set(developerName)
-              email.set(developerMail)
-            }
-          }
-          if (!orgId.isNullOrEmpty()) {
-            developer {
-              id.set(orgId)
-              name.set(orgName)
-              organization.set(orgName)
-              organizationUrl.set(orgUrl)
-            }
-          }
-        }
-        if (!orgName.isNullOrEmpty()) {
-          organization {
-            name.set(orgName)
-            if (!orgUrl.isNullOrEmpty())
-              url.set(orgUrl)
-          }
-        }
+        this.configure(artifactIdToUse)
       }
     }
   }
@@ -122,6 +82,62 @@ configure<PublishingExtension> {
   if (sonatypeUsername != null && sonatypePassword != null) {
     configure<SigningExtension> {
       sign(publishing.publications)
+    }
+  }
+}
+
+fun org.gradle.api.publish.maven.MavenPublication.configure(artifactIdToUse: String) {
+  groupId = groupId
+  artifactId = artifactIdToUse
+  version = artifactVersion
+
+  println("Publishing $groupId:$artifactId:$version ($name)")
+
+  if (name == "jvm") {
+    artifact(tasks["javadocJar"])
+  }
+
+  pom {
+    name.set(artifactIdToUse)
+    description.set(projectDescription)
+    url.set("https://$sourceCodeRepositoryBaseUrl")
+
+    licenses {
+      license {
+        name.set(licenseName)
+        url.set(licenseUrl)
+      }
+    }
+
+    scm {
+      url.set("https://$sourceCodeRepositoryBaseUrl")
+      connection.set("scm:git:git://${sourceCodeRepositoryBaseUrl}.git")
+      developerConnection.set("scm:git:ssh://${sourceCodeRepositoryBaseUrl}.git")
+    }
+
+    developers {
+      if (!developerId.isNullOrEmpty()) {
+        developer {
+          id.set(developerId)
+          name.set(developerName)
+          email.set(developerMail)
+        }
+      }
+      if (!orgId.isNullOrEmpty()) {
+        developer {
+          id.set(orgId)
+          name.set(orgName)
+          organization.set(orgName)
+          organizationUrl.set(orgUrl)
+        }
+      }
+    }
+    if (!orgName.isNullOrEmpty()) {
+      organization {
+        name.set(orgName)
+        if (!orgUrl.isNullOrEmpty())
+          url.set(orgUrl)
+      }
     }
   }
 }
