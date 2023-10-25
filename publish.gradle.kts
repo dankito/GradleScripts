@@ -93,7 +93,7 @@ fun org.gradle.api.publish.maven.MavenPublication.configure(artifactIdToUse: Str
 
   println("Publishing $groupId:$artifactId:$version ($name)")
 
-  if (name == "jvm") {
+  if (name == "jvm" || name == "mavenJava") {
     artifact(tasks["javadocJar"])
   }
 
