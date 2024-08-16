@@ -44,8 +44,8 @@ def configurePublishingTaskForProject(groupName, artifactName, projectVersion, p
     apply plugin: "signing"
 
 
-    def sonatypeUsername = rootProject.findProperty("ossrhUsername") // TODO: rename to sonatypeUsername
-    def sonatypePassword = rootProject.findProperty("ossrhPassword") // TODO: rename to sonatypePassword
+    def sonatypeUsername = rootProject.findProperty("sonatypeUsername")
+    def sonatypePassword = rootProject.findProperty("sonatypePassword")
 
     def versionMajor = gradle.gradleVersion.substring(0, gradle.gradleVersion.indexOf('.'))
     if (Integer.parseInt(versionMajor) >= 6) { // is only available for Gradle versions 6 and above
