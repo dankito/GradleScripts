@@ -6,6 +6,13 @@ setExtraValueIfNotSet("developerId", "codinux")
 setExtraValueIfNotSet("developerName", "codinux GmbH & Co. KG")
 setExtraValueIfNotSet("developerMail", "git@codinux.net")
 
+// defined in user's global gradle.properties
+val codinuxSonatypeTokenUsername: String by project
+val codinuxSonatypeTokenPassword: String by project
+
+setExtraValueIfNotSet("sonatypeUsername", codinuxSonatypeTokenUsername)
+setExtraValueIfNotSet("sonatypePassword", codinuxSonatypeTokenPassword)
+
 
 apply(from = File(buildscript.sourceFile?.parentFile, "publish.gradle.kts"))
 

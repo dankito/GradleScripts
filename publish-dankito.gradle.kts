@@ -6,6 +6,13 @@ setExtraValueIfNotSet("developerId", "dankito")
 setExtraValueIfNotSet("developerName", "Christian Dankl")
 setExtraValueIfNotSet("developerMail", "maven@dankito.net")
 
+// defined in user's global gradle.properties
+val dankitoSonatypeTokenUsername: String by project
+val dankitoSonatypeTokenPassword: String by project
+
+setExtraValueIfNotSet("sonatypeUsername", dankitoSonatypeTokenUsername)
+setExtraValueIfNotSet("sonatypePassword", dankitoSonatypeTokenPassword)
+
 
 apply(from = File(buildscript.sourceFile?.parentFile, "publish.gradle.kts"))
 
