@@ -3,9 +3,12 @@ import org.gradle.api.publish.PublishingExtension
 apply(plugin = "maven-publish")
 apply(plugin = "signing")
 
-// defined in user's global gradle.properties
-val sonatypeUsername: String? by project
-val sonatypePassword: String? by project
+// defined in publish-codinux.gradle.kts respectively publish-dankito.gradle.kts
+val repositoryReleaseUrl: String by project
+val repositorySnapshotsUrl: String by project
+
+val repositoryUsername: String? by project
+val repositoryPassword: String? by project
 
 val groupId: String = getOrDefault("groupId", project.group as String)
 val customArtifactId: String? by extra
@@ -13,7 +16,6 @@ val artifactVersion: String = getOrDefault("artifactVersion", project.version as
 
 val projectDescription: String by extra
 val sourceCodeRepositoryBaseUrl: String by extra
-val useNewSonatypeRepo: Boolean by extra
 
 val licenseName: String = getOrDefault("licenseName", "The Apache License, Version 2.0")
 val licenseUrl: String = getOrDefault("licenseUrl", "http://www.apache.org/licenses/LICENSE-2.0.txt")
@@ -69,17 +71,17 @@ configure<PublishingExtension> {
   }
 
   repositories {
-    maven(getSonatypeUrl(useNewSonatypeRepo, artifactVersion)) {
-      if (sonatypeUsername != null && sonatypePassword != null) {
+    maven(getRepositoryUrl(artifactVersion)) {
+      if (repositoryUsername != null && repositoryPassword != null) {
         credentials {
-          username = sonatypeUsername
-          password = sonatypePassword
+          username = repositoryUsername
+          password = repositoryPassword
         }
       }
     }
   }
 
-  if (sonatypeUsername != null && sonatypePassword != null) {
+  if (repositoryUsername != null && repositoryPassword != null) {
     configure<SigningExtension> {
       sign(publishing.publications)
     }
@@ -142,14 +144,9 @@ fun org.gradle.api.publish.maven.MavenPublication.configure(artifactIdToUse: Str
   }
 }
 
-fun getSonatypeUrl(useNewSonatypeRepo: Boolean, artifactVersion: String): String {
+fun getRepositoryUrl(artifactVersion: String): String {
   val isReleaseVersion = artifactVersion.endsWith("SNAPSHOT") == false
 
-  return if (useNewSonatypeRepo) {
-    if (isReleaseVersion) "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-    else "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-  } else {
-    if (isReleaseVersion) "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-    else "https://oss.sonatype.org/content/repositories/snapshots/"
-  }
+  return if (isReleaseVersion) repositoryReleaseUrl
+    else repositorySnapshotsUrl
 }
