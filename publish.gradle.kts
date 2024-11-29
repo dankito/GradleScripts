@@ -34,6 +34,11 @@ fun <T> getOrDefault(name: String, defaultValue: T): T {
 }
 
 
+val isJavaPluginApplied = project.plugins.hasPlugin("java")
+//val isKotlinMultiplatformProject = project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")
+val isKotlinMultiplatformProject = project.plugins.any { it::class.java.name.startsWith("org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPlugin") }
+
+
 tasks {
     create<Jar>("javadocJar") {
         archiveClassifier.set("javadoc")
@@ -41,8 +46,15 @@ tasks {
 //        from(dokkaHtml.get().outputDirectory)
     }
 }
+if (isJavaPluginApplied) {
+  tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
 
-val isKotlinMultiplatformProject = project.plugins.any { it::class.java.name.startsWith("org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPlugin") }
+    val sourceSets = project.getExtensions().getByType<org.gradle.api.plugins.JavaPluginExtension>(org.gradle.api.plugins.JavaPluginExtension::class.java).getSourceSets()
+    from(sourceSets.getByName("main").allSource)
+  }
+}
+
 
 configure<PublishingExtension> {
   val publishing = this
@@ -62,6 +74,10 @@ configure<PublishingExtension> {
     } else {
       create<MavenPublication>("mavenJava") {
         from(components["java"])
+
+        if (isJavaPluginApplied) {
+          artifact(tasks.named("sourcesJar"))
+        }
 
         val artifactIdToUse = customArtifactId ?: artifactId
 
