@@ -37,6 +37,7 @@ fun <T> getOrDefault(name: String, defaultValue: T): T {
 val isJavaPluginApplied = project.plugins.hasPlugin("java")
 //val isKotlinMultiplatformProject = project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")
 val isKotlinMultiplatformProject = project.plugins.any { it::class.java.name.startsWith("org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPlugin") }
+val isAndroidProject = project.plugins.any { it::class.java.name.startsWith("com.android.build.gradle.api.AndroidBasePlugin") }
 
 
 tasks {
@@ -70,6 +71,29 @@ configure<PublishingExtension> {
         } ?: artifactId
 
         this.configure(artifactIdToUse)
+      }
+    } else if (isAndroidProject) {
+      afterEvaluate {
+//        tasks.register<Jar>("sourcesJar") {
+//          archiveClassifier.set("sources")
+//          from(fileTree("src/main/kotlin")) // TODO: has to be android.sourceSets["main"].java.srcDirs
+//        }
+
+        components.findByName("release")?.let { releaseComponent ->
+          create<MavenPublication>("release") {
+            from(releaseComponent)
+
+            // haven't found a way yet to create a sourcesJar task here that references android.sourceSets["main"], so
+            // this still has to be done in project's build.gradle(.kts)
+            tasks.findByName("sourcesJar")?.let { sourcesJarTask ->
+              artifact(sourcesJarTask)
+            }
+
+            val artifactIdToUse = customArtifactId ?: artifactId
+
+            this.configure(artifactIdToUse)
+          }
+        }
       }
     } else {
       create<MavenPublication>("mavenJava") {
