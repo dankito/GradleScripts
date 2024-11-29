@@ -7,8 +7,8 @@ setExtraValueIfNotSet("repositoryReleaseUrl", "https://maven.dankito.net/api/pac
 setExtraValueIfNotSet("repositorySnapshotsUrl", "https://maven.dankito.net/api/packages/codinux/maven")
 
 // defined in user's global gradle.properties
-val codinuxRegistryWriterUsername: String by project
-val codinuxRegistryWriterPassword: String by project
+val codinuxRegistryWriterUsername: String? by project
+val codinuxRegistryWriterPassword: String? by project
 
 setExtraValueIfNotSet("repositoryUsername", codinuxRegistryWriterUsername)
 setExtraValueIfNotSet("repositoryPassword", codinuxRegistryWriterPassword)

@@ -7,8 +7,8 @@ setExtraValueIfNotSet("repositoryReleaseUrl", "https://oss.sonatype.org/service/
 setExtraValueIfNotSet("repositorySnapshotsUrl", "https://oss.sonatype.org/content/repositories/snapshots/")
 
 // defined in user's global gradle.properties
-val dankitoSonatypeTokenUsername: String by project
-val dankitoSonatypeTokenPassword: String by project
+val dankitoSonatypeTokenUsername: String? by project
+val dankitoSonatypeTokenPassword: String? by project
 
 setExtraValueIfNotSet("repositoryUsername", dankitoSonatypeTokenUsername)
 setExtraValueIfNotSet("repositoryPassword", dankitoSonatypeTokenPassword)
