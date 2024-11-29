@@ -18,7 +18,7 @@ val projectDescription: String by extra
 val sourceCodeRepositoryBaseUrl: String by extra
 
 val licenseName: String = getOrDefault("licenseName", "The Apache License, Version 2.0")
-val licenseUrl: String = getOrDefault("licenseUrl", "http://www.apache.org/licenses/LICENSE-2.0.txt")
+val licenseUrl: String = getOrDefault("licenseUrl", "https://www.apache.org/licenses/LICENSE-2.0.txt")
 
 // optional properties
 val orgId: String? by project

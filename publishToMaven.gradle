@@ -8,7 +8,7 @@ if (generatePublishingTaskForProject()) {
     def sourceCodeRepositoryBaseUrl = project.findProperty("sourceCodeRepositoryBaseUrl") ?: rootProject.findProperty("sourceCodeRepositoryBaseUrl")
 
     def licenseName = project.findProperty("licenseName") ?: rootProject.findProperty("licenseName") ?: "The Apache License, Version 2.0"
-    def licenseUrl = project.findProperty("licenseUrl") ?: rootProject.findProperty("licenseUrl") ?: "http://www.apache.org/licenses/LICENSE-2.0.txt"
+    def licenseUrl = project.findProperty("licenseUrl") ?: rootProject.findProperty("licenseUrl") ?: "https://www.apache.org/licenses/LICENSE-2.0.txt"
 
     def developerId = project.findProperty("developerId") ?: rootProject.findProperty("developerId") ?: "dankito"
     def developerName = project.findProperty("developerName") ?: rootProject.findProperty("developerName") ?: "Christian Dankl"
