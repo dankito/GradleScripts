@@ -4,11 +4,15 @@ apply(plugin = "maven-publish")
 apply(plugin = "signing")
 
 // defined in publish-codinux.gradle.kts respectively publish-dankito.gradle.kts
-val repositoryReleaseUrl: String by project
-val repositorySnapshotsUrl: String by project
+val repositoryReleaseUrl = getOrDefault("repositoryReleaseUrl", "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
+val repositorySnapshotsUrl = getOrDefault("repositorySnapshotsUrl", "https://central.sonatype.com/repository/maven-snapshots/")
 
-val repositoryUsername: String? by project
-val repositoryPassword: String? by project
+// defined in user's global gradle.properties
+val mavenCentralPortalUsername: String? by project
+val mavenCentralPortalPassword: String? by project
+
+val repositoryUsername = getOrDefault("repositoryUsername", mavenCentralPortalUsername)
+val repositoryPassword = getOrDefault("repositoryPassword", mavenCentralPortalPassword)
 
 val groupId: String = getOrDefault("groupId", project.group as String)
 val customArtifactId: String? by extra
